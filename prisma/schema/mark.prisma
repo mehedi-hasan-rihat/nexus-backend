@@ -1,14 +1,14 @@
 model Mark {
-  id             Int            @id @default(autoincrement())
-  campusId       Int
-  studentId      Int
-  subjectId      Int
+  id             String         @id @default(cuid())
+  campusId       String
+  studentId      String
+  subjectId      String
   assessmentType AssessmentType
   assessmentNo   Int?
   marksObtained  Float
   status         MarkStatus     @default(PENDING)
-  submittedById  Int
-  approvedById   Int?
+  submittedById  String
+  approvedById   String?
   submittedAt    DateTime       @default(now())
   approvedAt     DateTime?
   createdAt      DateTime       @default(now())

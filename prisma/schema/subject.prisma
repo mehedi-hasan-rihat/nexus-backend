@@ -1,7 +1,7 @@
 model Subject {
-  id           Int    @id @default(autoincrement())
-  campusId     Int
-  departmentId Int
+  id           String @id @default(cuid())
+  campusId     String
+  departmentId String
   name         String
   code         String @unique
   semester     Int

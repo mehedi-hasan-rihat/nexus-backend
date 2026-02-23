@@ -1,5 +1,5 @@
 model Department {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String
   shortName String   @unique
   createdAt DateTime @default(now())

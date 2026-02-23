@@ -1,12 +1,12 @@
 model Campus {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(cuid())
   campusName String
   campusCode String   @unique
   address    String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  createdById Int
+  createdById String
   createdBy   User    @relation("CampusCreatedBy", fields: [createdById], references: [id])
 
   departments CampusDepartment[]

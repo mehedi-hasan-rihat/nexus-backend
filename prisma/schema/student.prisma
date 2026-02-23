@@ -1,12 +1,12 @@
 model Student {
-  id           Int    @id @default(autoincrement())
-  userId       Int    @unique
-  campusId     Int
+  id           String @id @default(cuid())
+  userId       String    @unique
+  campusId     String
   roll         String
   session      String
   semester     Int
   shift        Shift
-  departmentId Int
+  departmentId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

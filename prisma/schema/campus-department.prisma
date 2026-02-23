@@ -1,7 +1,7 @@
 model CampusDepartment {
-  id           Int      @id @default(autoincrement())
-  campusId     Int
-  departmentId Int
+  id           String   @id @default(cuid())
+  campusId     String
+  departmentId String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
