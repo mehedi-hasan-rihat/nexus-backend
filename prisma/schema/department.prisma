@@ -1,0 +1,12 @@
+model Department {
+  id        Int      @id @default(autoincrement())
+  name      String
+  shortName String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campuses CampusDepartment[]
+  teachers Teacher[]
+  students Student[]
+  subjects Subject[]
+}

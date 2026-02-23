@@ -1,0 +1,20 @@
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  phone     String?
+  address   String?
+
+  teacher Teacher? @relation("TeacherUser")
+  student Student? @relation("StudentUser")
+
+  createdCampuses Campus[] @relation("CampusCreatedBy")
+
+  @@index([role])
+  @@index([isActive])
+}

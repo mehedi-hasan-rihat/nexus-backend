@@ -1,0 +1,12 @@
+model CampusDepartment {
+  id           Int      @id @default(autoincrement())
+  campusId     Int
+  departmentId Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  campus     Campus     @relation(fields: [campusId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@unique([campusId, departmentId])
+}

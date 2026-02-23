@@ -1,0 +1,25 @@
+model Mark {
+  id             Int            @id @default(autoincrement())
+  campusId       Int
+  studentId      Int
+  subjectId      Int
+  assessmentType AssessmentType
+  assessmentNo   Int?
+  marksObtained  Float
+  status         MarkStatus     @default(PENDING)
+  submittedById  Int
+  approvedById   Int?
+  submittedAt    DateTime       @default(now())
+  approvedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  campus  Campus  @relation(fields: [campusId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  @@unique([campusId, studentId, subjectId, assessmentType, assessmentNo])
+  @@index([studentId])
+  @@index([subjectId])
+  @@index([status])
+}
