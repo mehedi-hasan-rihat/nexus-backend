@@ -10,7 +10,7 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
-
+    trustedOrigins: [process.env.CLIENT_URL ?? "http://localhost:3000"],
     user: {
         additionalFields: {
             role: {
@@ -18,24 +18,19 @@ export const auth = betterAuth({
                 required: true,
                 defaultValue: UserRole.STUDENT
             },
-
             isActive: {
                 type: "boolean",
                 required: true,
                 defaultValue: false
             },
-
             phone: {
                 type: "string",
                 required: false,
             },
-
             address: {
                 type: "string",
                 required: false,
             }
-
         }
     },
-
 });
