@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import routes from "./routes/index.js";
@@ -14,6 +15,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(express.json());
+app.use(morgan("dev"));
 
 // better-auth handler (must be before other routes)
 app.all("/api/auth/*splat", toNodeHandler(auth));

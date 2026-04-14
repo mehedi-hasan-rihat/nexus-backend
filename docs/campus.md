@@ -7,7 +7,7 @@ Base: `/api/campus`
 ### POST `/api/campus`
 Create a campus and register its principal user in a single transaction.
 
-**Auth required:** Yes
+**Auth required:** No
 
 **Body:**
 ```json

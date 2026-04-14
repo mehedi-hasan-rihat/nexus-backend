@@ -5,10 +5,9 @@ import AppError from "../../errorHelpers/AppError.js";
 import { ICreateCampusPayload } from "./campus.interface.js";
 import status from "http-status";
 
-const createCampus = async (payload: ICreateCampusPayload, createdById: string) => {
+const createCampus = async (payload: ICreateCampusPayload) => {
     const { campusName, campusCode, address, principal } = payload;
 
-    // register principal user via better-auth outside transaction
     const registered = await auth.api.signUpEmail({
         body: {
             name: principal.name,
@@ -21,14 +20,13 @@ const createCampus = async (payload: ICreateCampusPayload, createdById: string) 
 
     try {
         const result = await prisma.$transaction(async (tx) => {
-            // promote the newly registered user to PRINCIPAL
             await tx.user.update({
                 where: { id: registered.user.id },
                 data: { role: UserRole.PRINCIPAL, isActive: true },
             });
 
             const campus = await tx.campus.create({
-                data: { campusName, campusCode, address, createdById },
+                data: { campusName, campusCode, address, createdById: registered.user.id },
             });
 
             return { campus, principal: registered.user };

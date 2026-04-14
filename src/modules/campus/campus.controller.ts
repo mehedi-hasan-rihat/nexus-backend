@@ -11,7 +11,7 @@ export const createCampus = catchAsync(async (req: Request, res: Response) => {
     if (!campusName || !campusCode) throw new AppError(status.BAD_REQUEST as number, "campusName and campusCode are required");
     if (!principal?.name || !principal?.email || !principal?.password) throw new AppError(status.BAD_REQUEST as number, "principal name, email and password are required");
 
-    const data = await campusService.createCampus(req.body, req.user!.id);
+    const data = await campusService.createCampus(req.body);
 
     sendResponse(res, {
         httpStatusCode: status.CREATED as number,
