@@ -1,0 +1,32 @@
+enum UserRole {
+  PRINCIPAL
+  HOD
+  TEACHER
+  STUDENT
+  VOLUNTEER
+}
+
+enum MarkStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AssessmentType {
+  CLASS_TEST
+  QUIZ
+  MIDTERM
+  ATTENDANCE
+}
+
+enum Shift {
+  MORNING
+  EVENING
+}
+
+enum CreditType {
+  ONE
+  TWO
+  THREE
+  FOUR
+}

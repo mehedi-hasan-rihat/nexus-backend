@@ -1,0 +1,22 @@
+model Student {
+  id           String @id @default(cuid())
+  userId       String    @unique
+  campusId     String
+  roll         String
+  session      String
+  semester     Int
+  shift        Shift
+  departmentId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user       User       @relation("StudentUser", fields: [userId], references: [id])
+  campus     Campus     @relation(fields: [campusId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  marks Mark[]
+
+  @@unique([campusId, departmentId, roll, session])
+  @@index([campusId, departmentId])
+}

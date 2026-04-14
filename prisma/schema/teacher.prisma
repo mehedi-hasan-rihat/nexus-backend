@@ -1,0 +1,20 @@
+model Teacher {
+  id           String @id @default(cuid())
+  userId       String @unique
+  campusId     String
+  departmentId String
+
+  employeeId   String?   @unique
+  designation  String?   // Assistant Professor, Lecturer, etc.
+  qualification String?
+
+  joinedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User       @relation("TeacherUser", fields: [userId], references: [id])
+  campus     Campus     @relation(fields: [campusId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@index([campusId, departmentId])
+}
