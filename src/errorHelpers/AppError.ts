@@ -1,21 +1,9 @@
-declare global {
-    interface ErrorConstructor {
-        captureStackTrace(target: object, constructor?: Function): void;
-    }
-}
-
 class AppError extends Error {
     public statusCode: number;
 
-    constructor(statusCode: number, message: string, stack = '') {
+    constructor(statusCode: number, message: string) {
         super(message) // Error("My Error Message")
         this.statusCode = statusCode;
-
-        if (stack) {
-            this.stack = stack;
-        } else {
-            Error.captureStackTrace(this, this.constructor)
-        }
     }
 }
 

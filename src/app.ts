@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from "express";
 import routes from "./routes/index.js";
-import { errorHandler } from "./middleware/errorHandler.js";
+import { globalErrorHandler } from "./middleware/errorHandler.js";
 
 const app: Application = express();
 
@@ -16,6 +16,6 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // Error handler (must be last)
-app.use(errorHandler);
+app.use(globalErrorHandler);
 
 export default app;
