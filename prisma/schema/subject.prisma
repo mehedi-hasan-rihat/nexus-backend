@@ -1,19 +1,17 @@
 model Subject {
-  id           String @id @default(cuid())
-  campusId     String
-  departmentId String
-  name         String
-  code         String @unique
-  semester     Int
-  MaxMarks     Float
-  credit       CreditType
+  id                 String     @id @default(cuid())
+  campusDepartmentId String
+  name               String
+  code               String     @unique
+  semester           Int
+  maxMarks           Float
+  credit             CreditType
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  campus     Campus     @relation(fields: [campusId], references: [id])
-  department Department @relation(fields: [departmentId], references: [id])
-  marks      Mark[]
+  campusDepartment CampusDepartment @relation(fields: [campusDepartmentId], references: [id])
+  marks            Mark[]
 
-  @@index([campusId, departmentId])
+  @@index([campusDepartmentId])
 }

@@ -6,7 +6,4 @@ model Department {
   updatedAt DateTime @updatedAt
 
   campuses CampusDepartment[]
-  teachers Teacher[]
-  students Student[]
-  subjects Subject[]
 }

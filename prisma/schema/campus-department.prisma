@@ -8,5 +8,10 @@ model CampusDepartment {
   campus     Campus     @relation(fields: [campusId], references: [id])
   department Department @relation(fields: [departmentId], references: [id])
 
+  teachers Teacher[]
+  students Student[]
+  subjects Subject[]
+  marks    Mark[]
+
   @@unique([campusId, departmentId])
 }

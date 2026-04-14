@@ -10,10 +10,6 @@ model Campus {
   createdBy   User    @relation("CampusCreatedBy", fields: [createdById], references: [id])
 
   departments CampusDepartment[]
-  teachers    Teacher[]
-  students    Student[]
-  subjects    Subject[]
-  marks       Mark[]
 
   @@index([createdById])
 }
