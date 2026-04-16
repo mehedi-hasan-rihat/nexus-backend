@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import status from "http-status";
-import { fromNodeHeaders, toNodeHandler } from "better-auth/node";
+import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../../lib/auth.js";
 import { authService } from "./auth.service.js";
 import { catchAsync } from "../../utils/asyncHandler.js";
@@ -18,14 +18,12 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const login = catchAsync(async (req: Request, res: Response) => {
-    const { user, session } = await authService.login(req.body);
+    const { user, token } = await authService.login(req.body);
 
-    // manually set HTTP-only session cookie
-    res.cookie("better-auth.session_token", session.token, {
+    res.cookie("better-auth.session_token", token, {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
-        expires: new Date(session.expiresAt),
         path: "/",
     });
 

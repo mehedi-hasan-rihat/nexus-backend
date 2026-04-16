@@ -16,7 +16,7 @@ const login = async (payload: ILoginPayload) => {
 
     if (!data.user) throw new AppError(status.UNAUTHORIZED as number, "Invalid credentials");
 
-    return { user: data.user, session: data.session };
+    return { user: data.user, token: data.token };
 };
 
 export const authService = { register, login };

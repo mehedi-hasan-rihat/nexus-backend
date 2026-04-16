@@ -17,9 +17,6 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(morgan("dev"));
 
-// better-auth handler (must be before other routes)
-app.all("/api/auth/*splat", toNodeHandler(auth));
-
 app.use('/api', routes);
 
 app.get('/', (req: Request, res: Response) => {
