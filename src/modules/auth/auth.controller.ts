@@ -5,6 +5,7 @@ import { auth } from "../../lib/auth.js";
 import { authService } from "./auth.service.js";
 import { catchAsync } from "../../utils/asyncHandler.js";
 import { sendResponse } from "../../utils/sendResponse.js";
+import { tokenUtils } from "../../utils/token.js";
 
 export const register = catchAsync(async (req: Request, res: Response) => {
     const user = await authService.register(req.body);
@@ -18,14 +19,11 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const login = catchAsync(async (req: Request, res: Response) => {
-    const { user, token } = await authService.login(req.body);
+    const { user, sessionToken, accessToken, refreshToken } = await authService.login(req.body);
 
-    res.cookie("better-auth.session_token", token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-    });
+    tokenUtils.setBetterAuthSessionCookie(res, sessionToken);
+    tokenUtils.setAccessTokenCookie(res, accessToken);
+    tokenUtils.setRefreshTokenCookie(res, refreshToken);
 
     sendResponse(res, {
         httpStatusCode: status.OK as number,
@@ -39,6 +37,8 @@ export const logout = catchAsync(async (req: Request, res: Response) => {
     await auth.api.signOut({ headers: fromNodeHeaders(req.headers) });
 
     res.clearCookie("better-auth.session_token", { path: "/" });
+    res.clearCookie("accessToken", { path: "/" });
+    res.clearCookie("refreshToken", { path: "/" });
 
     sendResponse(res, {
         httpStatusCode: status.OK as number,

@@ -17,7 +17,7 @@ export const addUser = catchAsync(async (req: Request, res: Response) => {
         throw new AppError(status.BAD_REQUEST as number, "campusDepartmentId is required");
     }
 
-    const data = await userService.addUser(req.body, req.user!.id, req.user!.role as UserRole);
+    const data = await userService.addUser(req.body, req.user!.userId, req.user!.role as UserRole);
 
     sendResponse(res, {
         httpStatusCode: status.CREATED as number,

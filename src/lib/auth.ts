@@ -4,6 +4,7 @@ import { prisma } from "./prisma";
 import { UserRole } from "../generated/prisma/enums";
 
 export const auth = betterAuth({
+    baseURL: process.env.BETTER_AUTH_BASE_URL ?? "http://localhost:5000",
     database: prismaAdapter(prisma, {
         provider: "postgresql"
     }),
@@ -33,4 +34,14 @@ export const auth = betterAuth({
             }
         }
     },
+
+    session: {
+        expiresIn: 60 * 60 * 60 * 24, // 1 day in seconds
+        updateAge: 60 * 60 * 60 * 24, // 1 day in seconds
+        cookieCache: {
+            enabled: true,
+            maxAge: 60 * 60 * 60 * 24, // 1 day in seconds
+        }
+    },
+
 });

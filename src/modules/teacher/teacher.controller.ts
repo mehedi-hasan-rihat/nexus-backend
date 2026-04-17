@@ -11,25 +11,25 @@ export const createTeacher = catchAsync(async (req: Request, res: Response) => {
         throw new AppError(status.BAD_REQUEST as number, "name, email, password and campusDepartmentId are required");
     }
 
-    const data = await teacherService.createTeacher(req.user!.id, req.body);
+    const data = await teacherService.createTeacher(req.user!.userId, req.body);
 
     sendResponse(res, { httpStatusCode: status.CREATED as number, success: true, message: "Teacher created", data });
 });
 
 export const getTeachers = catchAsync(async (req: Request, res: Response) => {
-    const data = await teacherService.getTeachers(req.user!.id);
+    const data = await teacherService.getTeachers(req.user!.userId);
 
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Teachers fetched", data });
 });
 
 export const updateTeacher = catchAsync(async (req: Request, res: Response) => {
-    const data = await teacherService.updateTeacher(req.user!.id, req.params.id, req.body);
+    const data = await teacherService.updateTeacher(req.user!.userId, req.params.id, req.body);
 
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Teacher updated", data });
 });
 
 export const deleteTeacher = catchAsync(async (req: Request, res: Response) => {
-    await teacherService.deleteTeacher(req.user!.id, req.params.id);
+    await teacherService.deleteTeacher(req.user!.userId, req.params.id);
 
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Teacher deleted" });
 });

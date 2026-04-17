@@ -19,26 +19,31 @@ const assertCampusDeptOwnership = async (principalId: string, campusDepartmentId
     return { campus, campusDept };
 };
 
-const createDepartment = async (principalId: string, payload: { name: string; shortName: string }) => {
+// SuperAdmin: get all global departments (for principal to pick from)
+const getAllDepartments = async () => {
+    return prisma.department.findMany({ orderBy: { name: "asc" } });
+};
+
+// Principal: assign an existing global department to their campus
+const addDepartmentToCampus = async (principalId: string, departmentId: string) => {
     const campus = await getPrincipalCampus(principalId);
 
-    return prisma.$transaction(async (tx) => {
-        const dept = await tx.department.upsert({
-            where: { shortName: payload.shortName },
-            update: {},
-            create: { name: payload.name, shortName: payload.shortName },
-        });
+    const dept = await prisma.department.findUnique({ where: { id: departmentId } });
+    if (!dept) throw new AppError(status.NOT_FOUND as number, "Department not found");
 
-        return tx.campusDepartment.upsert({
-            where: { campusId_departmentId: { campusId: campus.id, departmentId: dept.id } },
-            update: {},
-            create: { campusId: campus.id, departmentId: dept.id },
-            include: { department: true },
-        });
+    const existing = await prisma.campusDepartment.findUnique({
+        where: { campusId_departmentId: { campusId: campus.id, departmentId } },
+    });
+    if (existing) throw new AppError(status.CONFLICT as number, "Department already added to this campus");
+
+    return prisma.campusDepartment.create({
+        data: { campusId: campus.id, departmentId },
+        include: { department: true },
     });
 };
 
-const getDepartments = async (principalId: string) => {
+// Principal: get their campus departments
+const getCampusDepartments = async (principalId: string) => {
     const campus = await getPrincipalCampus(principalId);
 
     return prisma.campusDepartment.findMany({
@@ -50,18 +55,9 @@ const getDepartments = async (principalId: string) => {
     });
 };
 
-const updateDepartment = async (principalId: string, campusDepartmentId: string, payload: { name?: string; shortName?: string }) => {
-    const { campusDept } = await assertCampusDeptOwnership(principalId, campusDepartmentId);
-
-    return prisma.department.update({
-        where: { id: campusDept.departmentId },
-        data: payload,
-    });
-};
-
-const deleteDepartment = async (principalId: string, campusDepartmentId: string) => {
+// Principal: remove a department from their campus
+const removeDepartmentFromCampus = async (principalId: string, campusDepartmentId: string) => {
     await assertCampusDeptOwnership(principalId, campusDepartmentId);
-
     return prisma.campusDepartment.delete({ where: { id: campusDepartmentId } });
 };
 
@@ -76,6 +72,10 @@ const assignHOD = async (principalId: string, campusDepartmentId: string, hodPay
             await tx.user.update({
                 where: { id: registered.user.id },
                 data: { role: UserRole.HOD, isActive: true },
+            });
+
+            await tx.teacher.create({
+                data: { userId: registered.user.id, campusDepartmentId },
             });
 
             return tx.campusDepartment.update({
@@ -121,10 +121,10 @@ const removeHOD = async (principalId: string, campusDepartmentId: string) => {
 };
 
 export const departmentService = {
-    createDepartment,
-    getDepartments,
-    updateDepartment,
-    deleteDepartment,
+    getAllDepartments,
+    addDepartmentToCampus,
+    getCampusDepartments,
+    removeDepartmentFromCampus,
     assignHOD,
     changeHOD,
     removeHOD,

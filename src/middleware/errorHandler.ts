@@ -6,9 +6,7 @@ import AppError from "../errorHelpers/AppError";
 import { ApiResponse } from "../interfaces";
 
 export const globalErrorHandler = async (err: unknown, req: Request, res: Response, next: NextFunction) => {
-    if (process.env.NODE_ENV === 'development') {
-        console.log("Error from Global Error Handler", err);
-    }
+    console.error(`[${req.method}] ${req.path} →`, err);
 
     let statusCode = status.INTERNAL_SERVER_ERROR as number;
     let message = 'Internal Server Error';
