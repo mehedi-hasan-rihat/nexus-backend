@@ -17,7 +17,7 @@ export const createTeacher = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getTeachers = catchAsync(async (req: Request, res: Response) => {
-    const data = await teacherService.getTeachers(req.user!.userId);
+    const data = await teacherService.getTeachers(req.user!.userId, req.user!.role as UserRole);
 
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Teachers fetched", data });
 });

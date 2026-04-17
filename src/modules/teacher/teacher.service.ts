@@ -63,11 +63,24 @@ const createTeacher = async (
     }
 };
 
-const getTeachers = async (principalId: string) => {
-    const campus = await getPrincipalCampus(principalId);
+const getTeachers = async (userId: string, role: UserRole) => {
+    let campusId: string;
+
+    if (role === UserRole.PRINCIPAL) {
+        const campus = await getPrincipalCampus(userId);
+        campusId = campus.id;
+    } else {
+        // HOD or TEACHER — resolve campus via their teacher record
+        const teacher = await prisma.teacher.findFirst({
+            where: { userId },
+            include: { campusDepartment: true },
+        });
+        if (!teacher) throw new AppError(status.NOT_FOUND as number, "No campus department found for this user");
+        campusId = teacher.campusDepartment.campusId;
+    }
 
     return prisma.teacher.findMany({
-        where: { campusDepartment: { campusId: campus.id } },
+        where: { campusDepartment: { campusId } },
         include: {
             user: { select: { id: true, name: true, email: true, role: true, isActive: true } },
             campusDepartment: { include: { department: true } },

@@ -52,7 +52,7 @@ export const addDepartmentToCampus = catchAsync(async (req: Request, res: Respon
 
 // GET /api/principal/departments — get campus departments
 export const getCampusDepartments = catchAsync(async (req: Request, res: Response) => {
-    const data = await departmentService.getCampusDepartments(req.user!.userId);
+    const data = await departmentService.getCampusDepartments(req.user!.userId, req.user!.role as UserRole);
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Campus departments fetched", data });
 });
 
