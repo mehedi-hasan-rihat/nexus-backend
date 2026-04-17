@@ -26,7 +26,7 @@ const createCampus = async (payload: ICreateCampusPayload) => {
             });
 
             const campus = await tx.campus.create({
-                data: { campusName, campusCode, address, createdById: registered.user.id },
+                data: { campusName, campusCode, address, principalId: registered.user.id },
             });
 
             return { campus, principal: registered.user };

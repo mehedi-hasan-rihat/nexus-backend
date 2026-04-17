@@ -2,11 +2,13 @@ model CampusDepartment {
   id           String   @id @default(cuid())
   campusId     String
   departmentId String
+  hodId        String?  @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   campus     Campus     @relation(fields: [campusId], references: [id])
   department Department @relation(fields: [departmentId], references: [id])
+  hod        User?      @relation("DepartmentHOD", fields: [hodId], references: [id])
 
   teachers Teacher[]
   students Student[]

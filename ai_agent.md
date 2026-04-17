@@ -47,7 +47,6 @@ User
 
 Campus
   campusName, campusCode (unique), address?
-  createdById → User
   → departments[] (via CampusDepartment)
 
 Department

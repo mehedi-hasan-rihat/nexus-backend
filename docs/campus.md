@@ -43,7 +43,6 @@ Create a campus and register its principal user in a single transaction.
       "campusName": "Main Campus",
       "campusCode": "MC001",
       "address": "Dhaka, Bangladesh",
-      "createdById": "clx...",
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
     "principal": {

@@ -18,7 +18,8 @@ model User {
   teacher Teacher? @relation("TeacherUser")
   student Student? @relation("StudentUser")
 
-  createdCampuses Campus[] @relation("CampusCreatedBy")
+  principalCampus  Campus?  @relation("CampusPrincipal")
+  hodDepartment    CampusDepartment? @relation("DepartmentHOD")
 
   @@map("user")
   @@unique([email])

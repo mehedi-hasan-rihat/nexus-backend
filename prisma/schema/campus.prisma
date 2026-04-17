@@ -6,10 +6,9 @@ model Campus {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  createdById String
-  createdBy   User    @relation("CampusCreatedBy", fields: [createdById], references: [id])
+  principalId String  @unique
+
+  principal   User    @relation("CampusPrincipal", fields: [principalId], references: [id])
 
   departments CampusDepartment[]
-
-  @@index([createdById])
 }
