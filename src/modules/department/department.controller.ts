@@ -41,7 +41,7 @@ export const getAllDepartments = catchAsync(async (_req: Request, res: Response)
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Departments fetched", data });
 });
 
-// POST /api/principal/departments — add existing dept to campus
+// POST /api/departments — add existing dept to campus
 export const addDepartmentToCampus = catchAsync(async (req: Request, res: Response) => {
     const { departmentId } = req.body;
     if (!departmentId) throw new AppError(status.BAD_REQUEST as number, "departmentId is required");
@@ -50,19 +50,19 @@ export const addDepartmentToCampus = catchAsync(async (req: Request, res: Respon
     sendResponse(res, { httpStatusCode: status.CREATED as number, success: true, message: "Department added to campus", data });
 });
 
-// GET /api/principal/departments — get campus departments
+// GET /api/departments — get campus departments
 export const getCampusDepartments = catchAsync(async (req: Request, res: Response) => {
     const data = await departmentService.getCampusDepartments(req.user!.userId, req.user!.role as UserRole);
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Campus departments fetched", data });
 });
 
-// DELETE /api/principal/departments/:id — remove dept from campus
+// DELETE /api/departments/:id — remove dept from campus
 export const removeDepartmentFromCampus = catchAsync(async (req: Request, res: Response) => {
     await departmentService.removeDepartmentFromCampus(req.user!.userId, req.params.id as string);
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Department removed from campus" });
 });
 
-// POST /api/principal/departments/:id/hod — create new user as HOD
+// POST /api/departments/:id/hod — create new user as HOD
 export const assignHOD = catchAsync(async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) throw new AppError(status.BAD_REQUEST as number, "name, email and password are required");
@@ -71,7 +71,7 @@ export const assignHOD = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "HOD assigned", data });
 });
 
-// PATCH /api/principal/departments/:id/hod — assign existing user as HOD
+// PATCH /api/departments/:id/hod — assign existing user as HOD
 export const changeHOD = catchAsync(async (req: Request, res: Response) => {
     const { hodId } = req.body;
     if (!hodId) throw new AppError(status.BAD_REQUEST as number, "hodId is required");
@@ -80,7 +80,7 @@ export const changeHOD = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "HOD changed", data });
 });
 
-// DELETE /api/principal/departments/:id/hod — remove HOD
+// DELETE /api/departments/:id/hod — remove HOD
 export const removeHOD = catchAsync(async (req: Request, res: Response) => {
     const data = await departmentService.removeHOD(req.user!.userId, req.params.id as string);
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "HOD removed", data });

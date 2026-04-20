@@ -27,8 +27,8 @@ export const createStudent = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getStudents = catchAsync(async (req: Request, res: Response) => {
-    const data = await studentService.getStudents(req.user!.userId, req.user!.role as UserRole);
-
+    const semester = req.query.semester ? Number(req.query.semester) : undefined;
+    const data = await studentService.getStudents(req.user!.userId, req.user!.role as UserRole, semester);
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Students fetched", data });
 });
 

@@ -89,12 +89,13 @@ const createStudent = async (
     }
 };
 
-const getStudents = async (userId: string, role: UserRole) => {
+const getStudents = async (userId: string, role: UserRole, semester?: number) => {
     const campusId = await resolveCampusId(userId, role);
 
     return prisma.student.findMany({
-        where: { campusDepartment: { campusId } },
+        where: { campusDepartment: { campusId }, ...(semester ? { semester } : {}) },
         include: studentInclude,
+        orderBy: { roll: "asc" },
     });
 };
 
