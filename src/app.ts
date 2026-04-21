@@ -19,6 +19,13 @@ app.use(morgan("dev"));
 
 app.use('/api', routes);
 
+app.use('/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
+    // Handle Stripe webhook events here
+    // You can verify the event using Stripe's signature and process it accordingly
+    console.log('Received Stripe webhook event:', req.body);
+    res.status(200).send('Webhook received');
+});
+
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello, TypeScript + Express!');
 });

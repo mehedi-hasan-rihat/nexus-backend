@@ -11,4 +11,5 @@ model Campus {
   principal   User    @relation("CampusPrincipal", fields: [principalId], references: [id])
 
   departments CampusDepartment[]
+  payments    Payment[]
 }

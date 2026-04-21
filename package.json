@@ -9,7 +9,8 @@
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
     "lint": "eslint ./src/**/*",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "stripe:webhook": "stripe listen --forward-to localhost:5000/webhook"
   },
   "author": "",
   "license": "ISC",

@@ -30,3 +30,10 @@ enum CreditType {
   THREE
   FOUR
 }
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  FAILED
+  REFUNDED
+}
