@@ -42,6 +42,7 @@ export const checkAuth = (...authRoles: UserRole[]) => async (req: Request, res:
         }
 
         if (!user.isActive) {
+            console.log(user)
             throw new AppError(status.UNAUTHORIZED as number, "Unauthorized access! User is not active.");
         }
 

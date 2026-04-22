@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
@@ -22,12 +22,18 @@ app.post("/api/webhook/stripe", express.raw({ type: "application/json" }), strip
 app.use(express.json());
 app.use(morgan("dev"));
 
-// better-auth handler
-app.all("/api/auth/*splat", toNodeHandler(auth));
+// global request logger
+app.use((req: Request, _res: Response, next: NextFunction) => {
+    console.log(`→ ${req.method} ${req.path}`, Object.keys(req.body || {}).length ? req.body : '');
+    next();
+});
+
+// better-auth handler — must be before /api routes
+
 
 app.use('/api', routes);
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
     res.send('Hello, TypeScript + Express!');
 });
 
