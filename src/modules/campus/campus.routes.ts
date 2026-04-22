@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { createCampus } from "./campus.controller.js";
+import { initiateCampusRegistration } from "./campus.controller.js";
 
 const router = Router();
 
-router.post("/", createCampus);
+router.post("/initiate", initiateCampusRegistration);
 
 export default router;
