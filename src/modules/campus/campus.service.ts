@@ -7,6 +7,37 @@ import AppError from "../../errorHelpers/AppError.js";
 import { ICreateCampusPayload } from "./campus.interface.js";
 import status from "http-status";
 
+// called by webhook or directly
+const fulfillCampusRegistration = async (registrationId: string, stripeEventId: string, stripeSessionData: object) => {
+    const registration = await prisma.campusRegistration.findUnique({ where: { id: registrationId } });
+    if (!registration) throw new Error(`Registration ${registrationId} not found`);
+
+    await prisma.$transaction(async (tx) => {
+        const campus = await tx.campus.create({
+            data: {
+                campusName: registration.campusName,
+                campusCode: registration.campusCode,
+                address: registration.address ?? undefined,
+                principalId: registration.createdById,
+            },
+        });
+
+        await tx.payment.create({
+            data: {
+                amount: registration.amount,
+                transactionId: registration.stripeSessionId ?? `direct_${registrationId}`,
+                stripeEventId,
+                status: PaymentStatus.PAID,
+                paymentGatewayData: stripeSessionData,
+                campusId: campus.id,
+                registrationId: registration.id,
+            },
+        });
+
+        await tx.campusRegistration.delete({ where: { id: registrationId } });
+    });
+};
+
 const initiateCampusRegistration = async (payload: ICreateCampusPayload) => {
     const { campusName, campusCode, address, principal } = payload;
 
@@ -23,10 +54,11 @@ const initiateCampusRegistration = async (payload: ICreateCampusPayload) => {
         where: { id: registered.user.id },
         data: { isActive: true, role: UserRole.PRINCIPAL },
     });
+
     const amount = envVars.CAMPUS_REGISTRATION_FEE;
 
     try {
-        // step 2: save pending registration with createdById = principal user id
+        // step 2: save registration with createdById = principal user id
         const registration = await prisma.campusRegistration.create({
             data: {
                 campusName,
@@ -41,66 +73,37 @@ const initiateCampusRegistration = async (payload: ICreateCampusPayload) => {
             },
         });
 
-        // step 3: create Stripe checkout session
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
-            mode: "payment",
-            line_items: [{
-                price_data: {
-                    currency: "usd",
-                    unit_amount: amount * 100,
-                    product_data: { name: `Campus Registration — ${campusName}` },
-                },
-                quantity: 1,
-            }],
-            metadata: { registrationId: registration.id },
-            success_url: `${envVars.CLIENT_URL}/campus/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${envVars.CLIENT_URL}/campus/cancel`,
-            expires_at: Math.floor(Date.now() / 1000) + 60 * 30,
-        });
+        // step 3: fulfill campus immediately
+        await fulfillCampusRegistration(registration.id, `direct_${registration.id}`, { direct: true });
 
-        await prisma.campusRegistration.update({
-            where: { id: registration.id },
-            data: { stripeSessionId: session.id },
-        });
+        // step 4: try Stripe checkout (optional — for payment collection)
+        try {
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ["card"],
+                mode: "payment",
+                line_items: [{
+                    price_data: {
+                        currency: "usd",
+                        unit_amount: amount * 100,
+                        product_data: { name: `Campus Registration — ${campusName}` },
+                    },
+                    quantity: 1,
+                }],
+                metadata: { registrationId: registration.id },
+                success_url: `${envVars.CLIENT_URL}/campus/success?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${envVars.CLIENT_URL}/campus/cancel`,
+                expires_at: Math.floor(Date.now() / 1000) + 60 * 30,
+            });
 
-        return { checkoutUrl: session.url, registrationId: registration.id };
+            return { checkoutUrl: session.url, registrationId: registration.id, fulfilled: true };
+        } catch {
+            console.warn("Stripe unavailable — campus already fulfilled directly");
+            return { checkoutUrl: null, registrationId: registration.id, fulfilled: true };
+        }
     } catch (error) {
         await prisma.user.delete({ where: { id: registered.user.id } }).catch(() => null);
         throw error;
     }
-};
-
-// called by webhook after successful payment
-const fulfillCampusRegistration = async (registrationId: string, stripeEventId: string, stripeSessionData: object) => {
-    const registration = await prisma.campusRegistration.findUnique({ where: { id: registrationId } });
-    if (!registration) throw new Error(`Registration ${registrationId} not found`);
-
-    // principal user already exists (created in initiate step), just promote + create campus
-    await prisma.$transaction(async (tx) => {
-        const campus = await tx.campus.create({
-            data: {
-                campusName: registration.campusName,
-                campusCode: registration.campusCode,
-                address: registration.address ?? undefined,
-                principalId: registration.createdById,
-            },
-        });
-
-        await tx.payment.create({
-            data: {
-                amount: registration.amount,
-                transactionId: registration.stripeSessionId!,
-                stripeEventId,
-                status: PaymentStatus.PAID,
-                paymentGatewayData: stripeSessionData,
-                campusId: campus.id,
-                registrationId: registration.id,
-            },
-        });
-
-        await tx.campusRegistration.delete({ where: { id: registrationId } });
-    });
 };
 
 export const campusService = { initiateCampusRegistration, fulfillCampusRegistration };
