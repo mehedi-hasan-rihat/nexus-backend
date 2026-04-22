@@ -13,12 +13,16 @@ const initiateCampusRegistration = async (payload: ICreateCampusPayload) => {
     const existing = await prisma.campus.findUnique({ where: { campusCode } });
     if (existing) throw new AppError(status.CONFLICT as number, "Campus code already exists");
 
-    // step 1: register principal user
+    // step 1: register principal user, activate and assign PRINCIPAL role immediately
     const registered = await auth.api.signUpEmail({
         body: { name: principal.name, email: principal.email, password: principal.password },
     });
     if (!registered.user) throw new AppError(status.BAD_REQUEST as number, "Failed to create principal user");
 
+    await prisma.user.update({
+        where: { id: registered.user.id },
+        data: { isActive: true, role: UserRole.PRINCIPAL },
+    });
     const amount = envVars.CAMPUS_REGISTRATION_FEE;
 
     try {
@@ -74,11 +78,6 @@ const fulfillCampusRegistration = async (registrationId: string, stripeEventId: 
 
     // principal user already exists (created in initiate step), just promote + create campus
     await prisma.$transaction(async (tx) => {
-        await tx.user.update({
-            where: { id: registration.createdById },
-            data: { role: UserRole.PRINCIPAL, isActive: true },
-        });
-
         const campus = await tx.campus.create({
             data: {
                 campusName: registration.campusName,
