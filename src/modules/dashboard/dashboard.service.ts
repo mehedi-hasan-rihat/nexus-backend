@@ -10,8 +10,7 @@ const getPrincipalCampus = async (userId: string) => {
         where: { principalId: userId },
         include: { departments: { include: { department: true } } },
     });
-    if (!campus) throw new AppError(status.NOT_FOUND as number, "No campus found for this principal");
-    return campus;
+    return campus; // null if payment not completed yet
 };
 
 const getTeacherCampusDept = async (userId: string) => {
@@ -27,6 +26,23 @@ const getTeacherCampusDept = async (userId: string) => {
 
 const getPrincipalDashboard = async (userId: string) => {
     const campus = await getPrincipalCampus(userId);
+
+    // campus not created yet — payment pending
+    if (!campus) {
+        const registration = await prisma.campusRegistration.findFirst({
+            where: { createdById: userId },
+        });
+        return {
+            pendingPayment: true,
+            registration: registration ? {
+                campusName: registration.campusName,
+                campusCode: registration.campusCode,
+                amount: registration.amount,
+                expiresAt: registration.expiresAt,
+            } : null,
+        };
+    }
+
     const campusId = campus.id;
 
     const [departments, teachers, students, pendingMarks] = await Promise.all([
