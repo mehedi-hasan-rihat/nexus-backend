@@ -18,8 +18,9 @@ model User {
   teacher Teacher? @relation("TeacherUser")
   student Student? @relation("StudentUser")
 
-  principalCampus  Campus?  @relation("CampusPrincipal")
-  hodDepartment    CampusDepartment? @relation("DepartmentHOD")
+  principalCampus      Campus?               @relation("CampusPrincipal")
+  hodDepartment        CampusDepartment?     @relation("DepartmentHOD")
+  campusRegistrations  CampusRegistration[]  @relation("CampusRegistrationCreatedBy")
 
   @@map("user")
   @@unique([email])

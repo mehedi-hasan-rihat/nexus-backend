@@ -1,0 +1,22 @@
+model CampusRegistration {
+  id          String   @id @default(cuid())
+  campusName  String
+  campusCode  String
+  address     String?
+
+  createdById String
+
+  principalName     String
+  principalEmail    String
+  principalPassword String
+
+  stripeSessionId String?  @unique
+  amount          Float
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime
+
+  createdBy User     @relation("CampusRegistrationCreatedBy", fields: [createdById], references: [id])
+  payment   Payment?
+
+  @@map("campus_registrations")
+}

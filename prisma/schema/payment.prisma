@@ -8,10 +8,13 @@ model Payment {
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
-  campusId  String
-  campus    Campus @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  campusId       String?
+  registrationId String?  @unique
 
-  @@index([transactionId])
+  campus       Campus?             @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  registration CampusRegistration? @relation(fields: [registrationId], references: [id], onDelete: SetNull)
+
   @@index([campusId])
+  @@index([transactionId])
   @@map("payments")
 }

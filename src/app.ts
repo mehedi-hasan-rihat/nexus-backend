@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
+import { stripeWebhook } from "./modules/webhook/webhook.controller.js";
 import routes from "./routes/index.js";
 import { globalErrorHandler } from "./middleware/errorHandler.js";
 
@@ -14,17 +15,17 @@ app.use(cors({
     credentials: true,
 }));
 app.use(cookieParser());
+
+// Stripe webhook needs raw body — must be before express.json()
+app.post("/api/webhook/stripe", express.raw({ type: "application/json" }), stripeWebhook);
+
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use('/api', routes);
+// better-auth handler
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
-app.use('/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
-    // Handle Stripe webhook events here
-    // You can verify the event using Stripe's signature and process it accordingly
-    console.log('Received Stripe webhook event:', req.body);
-    res.status(200).send('Webhook received');
-});
+app.use('/api', routes);
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello, TypeScript + Express!');
