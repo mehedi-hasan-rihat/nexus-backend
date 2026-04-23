@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node dist/server.js",
-    "build": "tsc",
+    "build": "prisma generate && tsup src/index.ts --format esm --platform node --target node20 --outDir api --external pg-native",
+    "postinstall": "prisma generate",
     "dev": "tsx watch src/server.ts",
     "lint": "eslint ./src/**/*",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -41,6 +42,7 @@
     "@types/pg": "^8.16.0",
     "eslint": "^10.0.1",
     "prisma": "^7.4.1",
+    "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.0"
