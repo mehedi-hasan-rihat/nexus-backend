@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../utils/asyncHandler.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { teacherService } from "./teacher.service.js";
+import { UserRole } from "../../generated/prisma/enums.js";
 import AppError from "../../errorHelpers/AppError.js";
 import status from "http-status";
 
@@ -23,13 +24,13 @@ export const getTeachers = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const updateTeacher = catchAsync(async (req: Request, res: Response) => {
-    const data = await teacherService.updateTeacher(req.user!.userId, req.params.id, req.body);
+    const data = await teacherService.updateTeacher(req.user!.userId, req.params.id as string, req.body);
 
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Teacher updated", data });
 });
 
 export const deleteTeacher = catchAsync(async (req: Request, res: Response) => {
-    await teacherService.deleteTeacher(req.user!.userId, req.params.id);
+    await teacherService.deleteTeacher(req.user!.userId, req.params.id as string);
 
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Teacher deleted" });
 });

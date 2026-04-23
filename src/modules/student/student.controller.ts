@@ -52,7 +52,7 @@ export const updateStudent = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const deleteStudent = catchAsync(async (req: Request, res: Response) => {
-    await studentService.deleteStudent(req.user!.userId, req.user!.role as UserRole, req.params.id);
+    await studentService.deleteStudent(req.user!.userId, req.user!.role as UserRole, req.params.id as string);
 
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Student deleted" });
 });

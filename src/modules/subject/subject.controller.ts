@@ -25,7 +25,7 @@ export const getSubjects = catchAsync(async (req: Request, res: Response) => {
 
 export const updateSubject = catchAsync(async (req: Request, res: Response) => {
     const { name, code, semester, maxMarks, credit } = req.body;
-    const data = await subjectService.updateSubject(req.user!.userId, req.user!.role as UserRole, req.params.id, {
+    const data = await subjectService.updateSubject(req.user!.userId, req.user!.role as UserRole, req.params.id as string, {
         ...(name && { name }),
         ...(code && { code }),
         ...(semester && { semester: Number(semester) }),
@@ -36,6 +36,6 @@ export const updateSubject = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const deleteSubject = catchAsync(async (req: Request, res: Response) => {
-    await subjectService.deleteSubject(req.user!.userId, req.user!.role as UserRole, req.params.id);
+    await subjectService.deleteSubject(req.user!.userId, req.user!.role as UserRole, req.params.id as string);
     sendResponse(res, { httpStatusCode: status.OK as number, success: true, message: "Subject deleted" });
 });

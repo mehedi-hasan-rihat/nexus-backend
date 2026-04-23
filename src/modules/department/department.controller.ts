@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../utils/asyncHandler.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { departmentService } from "./department.service.js";
+import { UserRole } from "../../generated/prisma/enums.js";
 import { prisma } from "../../lib/prisma.js";
 import AppError from "../../errorHelpers/AppError.js";
 import status from "http-status";
