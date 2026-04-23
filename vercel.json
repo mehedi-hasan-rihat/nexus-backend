@@ -2,11 +2,6 @@
   "version": 2,
   "buildCommand": "npm run build:tsup",
   "outputDirectory": ".",
-  "functions": {
-    "api/index.js": {
-      "runtime": "@vercel/node@5"
-    }
-  },
   "routes": [
     {
       "src": "/(.*)",
