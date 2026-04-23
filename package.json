@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc && node scripts/fix-imports.js",
-    "build:tsup": "tsup",
+    "build:tsup": "prisma generate && tsup",
     "start": "node dist/server.js",
     "lint": "eslint ./src/**/*",
     "migrate": "prisma migrate dev",
