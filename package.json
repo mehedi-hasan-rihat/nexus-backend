@@ -5,13 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node dist/server.js",
-    "build": "prisma generate && tsup src/index.ts --format esm --platform node --target node20 --outDir api --external pg-native",
-    "postinstall": "prisma generate",
     "dev": "tsx watch src/server.ts",
+    "build": "prisma generate && tsc && node scripts/fix-imports.js",
+    "build:tsup": "tsup",
+    "start": "node dist/server.js",
     "lint": "eslint ./src/**/*",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "stripe:webhook": "stripe listen --forward-to localhost:5000/webhook"
+    "migrate": "prisma migrate dev",
+    "generate": "prisma generate",
+    "postinstall": "prisma generate"
   },
   "author": "",
   "license": "ISC",
