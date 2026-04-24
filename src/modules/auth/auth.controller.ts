@@ -29,7 +29,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
         httpStatusCode: status.OK as number,
         success: true,
         message: "Logged in successfully",
-        data: user,
+        data: { user, accessToken, sessionToken },
     });
 });
 

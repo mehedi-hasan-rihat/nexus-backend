@@ -10,7 +10,11 @@ import { jwtUtils } from "../utils/jwt.js";
 
 export const checkAuth = (...authRoles: UserRole[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const sessionToken = CookieUtils.getCookie(req, "better-auth.session_token");
+        // support both cookie and Authorization: Bearer <sessionToken>
+        const bearerToken = req.headers.authorization?.startsWith("Bearer ")
+            ? req.headers.authorization.slice(7)
+            : null;
+        const sessionToken = bearerToken || CookieUtils.getCookie(req, "better-auth.session_token");
 
         if (!sessionToken) {
             throw new AppError(status.UNAUTHORIZED as number, "Unauthorized access! No session token provided.");
@@ -30,7 +34,6 @@ export const checkAuth = (...authRoles: UserRole[]) => async (req: Request, res:
 
         const user = sessionExists.user;
 
-        // warn client if session is expiring soon (< 20% lifetime remaining)
         const sessionLifeTime = sessionExists.expiresAt.getTime() - sessionExists.createdAt.getTime();
         const timeRemaining = sessionExists.expiresAt.getTime() - Date.now();
         const percentRemaining = (timeRemaining / sessionLifeTime) * 100;
@@ -42,7 +45,6 @@ export const checkAuth = (...authRoles: UserRole[]) => async (req: Request, res:
         }
 
         if (!user.isActive) {
-            console.log(user)
             throw new AppError(status.UNAUTHORIZED as number, "Unauthorized access! User is not active.");
         }
 
@@ -50,8 +52,9 @@ export const checkAuth = (...authRoles: UserRole[]) => async (req: Request, res:
             throw new AppError(status.FORBIDDEN as number, "Forbidden! You do not have permission to access this resource.");
         }
 
-        // Access Token Verification
-        const accessToken = CookieUtils.getCookie(req, "accessToken");
+        // verify accessToken from header or cookie
+        const accessTokenHeader = req.headers["x-access-token"] as string | undefined;
+        const accessToken = accessTokenHeader || CookieUtils.getCookie(req, "accessToken");
 
         if (!accessToken) {
             throw new AppError(status.UNAUTHORIZED as number, "Unauthorized access! No access token provided.");
