@@ -10,9 +10,20 @@ import { globalErrorHandler } from "./middleware/errorHandler.js";
 
 const app: Application = express();
 
+const ALLOWED_ORIGINS = (
+    process.env.CLIENT_URL ?? "http://localhost:3000"
+).split(",").map((o) => o.trim());
+
 app.use(cors({
-    origin: process.env.CLIENT_URL ?? "http://localhost:3000",
+    origin: (origin, callback) => {
+        // allow requests with no origin (mobile apps, curl, Postman)
+        if (!origin) return callback(null, true);
+        if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+        callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(cookieParser());
 
