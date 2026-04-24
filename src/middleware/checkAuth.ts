@@ -1,20 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
 import status from "http-status";
 import { UserRole } from "../generated/prisma/enums.js";
 import { envVars } from "../config/env.js";
 import AppError from "../errorHelpers/AppError.js";
 import { prisma } from "../lib/prisma.js";
-import { CookieUtils } from "../utils/cookie.js";
 import { jwtUtils } from "../utils/jwt.js";
 
 export const checkAuth = (...authRoles: UserRole[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // support both cookie and Authorization: Bearer <sessionToken>
-        const bearerToken = req.headers.authorization?.startsWith("Bearer ")
+        const sessionToken = req.headers.authorization?.startsWith("Bearer ")
             ? req.headers.authorization.slice(7)
             : null;
-        const sessionToken = bearerToken || CookieUtils.getCookie(req, "better-auth.session_token");
 
         if (!sessionToken) {
             throw new AppError(status.UNAUTHORIZED as number, "Unauthorized access! No session token provided.");
@@ -52,9 +48,7 @@ export const checkAuth = (...authRoles: UserRole[]) => async (req: Request, res:
             throw new AppError(status.FORBIDDEN as number, "Forbidden! You do not have permission to access this resource.");
         }
 
-        // verify accessToken from header or cookie
-        const accessTokenHeader = req.headers["x-access-token"] as string | undefined;
-        const accessToken = accessTokenHeader || CookieUtils.getCookie(req, "accessToken");
+        const accessToken = req.headers["x-access-token"] as string | undefined;
 
         if (!accessToken) {
             throw new AppError(status.UNAUTHORIZED as number, "Unauthorized access! No access token provided.");
