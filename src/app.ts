@@ -34,8 +34,13 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // global request logger
-app.use((req: Request, _res: Response, next: NextFunction) => {
-    console.log(`→ ${req.method} ${req.path}`, Object.keys(req.body || {}).length ? req.body : '');
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const start = Date.now();
+    res.on("finish", () => {
+        const duration = Date.now() - start;
+        const color = res.statusCode >= 500 ? "\x1b[31m" : res.statusCode >= 400 ? "\x1b[33m" : "\x1b[32m";
+        console.log(`${color}[${res.statusCode}]\x1b[0m ${req.method} ${req.path} - ${duration}ms`);
+    });
     next();
 });
 

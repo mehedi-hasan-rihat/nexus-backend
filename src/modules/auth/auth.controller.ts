@@ -5,6 +5,7 @@ import { auth } from "../../lib/auth.js";
 import { authService } from "./auth.service.js";
 import { catchAsync } from "../../utils/asyncHandler.js";
 import { sendResponse } from "../../utils/sendResponse.js";
+import { prisma } from "../../lib/prisma.js";
 
 export const register = catchAsync(async (req: Request, res: Response) => {
     const user = await authService.register(req.body);
@@ -39,10 +40,14 @@ export const logout = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getMe = catchAsync(async (req: Request, res: Response) => {
+    const user = await prisma.user.findUnique({
+        where: { id: req.user!.userId },
+        select: { id: true, name: true, email: true, role: true, isActive: true },
+    });
     sendResponse(res, {
         httpStatusCode: status.OK as number,
         success: true,
         message: "User fetched successfully",
-        data: req.user,
+        data: user,
     });
 });

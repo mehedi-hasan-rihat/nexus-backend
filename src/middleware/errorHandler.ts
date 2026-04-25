@@ -6,8 +6,6 @@ import AppError from "../errorHelpers/AppError";
 import { ApiResponse } from "../interfaces";
 
 export const globalErrorHandler = async (err: unknown, req: Request, res: Response, next: NextFunction) => {
-    console.error(`[${req.method}] ${req.path} →`, err);
-
     let statusCode = status.INTERNAL_SERVER_ERROR as number;
     let message = 'Internal Server Error';
 
@@ -18,10 +16,12 @@ export const globalErrorHandler = async (err: unknown, req: Request, res: Respon
         message = err.message;
     }
 
-    const errorResponse: ApiResponse = {
-        success: false,
-        message,
-    };
+    console.error(
+        `\x1b[31m[ERROR]\x1b[0m ${req.method} ${req.path} → ${statusCode} ${message}${
+            err instanceof Error && statusCode >= 500 ? `\n${err.stack}` : ''
+        }`
+    );
 
+    const errorResponse: ApiResponse = { success: false, message };
     res.status(statusCode).json(errorResponse);
 };
